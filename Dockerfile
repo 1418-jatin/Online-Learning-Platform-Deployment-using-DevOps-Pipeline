@@ -1,8 +1,17 @@
-FROM nginx:alpine
+# Use official NGINX base image
+FROM nginx:latest
 
-# Copy the static site into nginx's default web root
-COPY index.html /usr/share/nginx/html/index.html
+# Set working directory inside container
+WORKDIR /usr/share/nginx/html
 
+# Copy your custom application files (frontend or static site)
+COPY ./index.html .
+COPY ./static ./static
+
+# Optional: replace default nginx config if needed
+# COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose port 80
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+# NGINX runs automatically as entrypoint
