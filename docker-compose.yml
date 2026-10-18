@@ -6,5 +6,5 @@ services:
     build: .
     container_name: my-jenkins-python-app-ci-cd
     ports:
-      - "8081:80"
+      - "9090:80"
     restart: unless-stopped
