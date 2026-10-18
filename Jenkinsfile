@@ -1,10 +1,10 @@
 pipeline {
-    agent any
+    agent { label 'jenkins-agent' }
 
     environment {
         // "docker-cred" must be a Jenkins "Username with password" credential
         // (username = Docker Hub ID, password = Docker Hub password or access token)
-        DOCKERHUB_CREDENTIALS = credentials('docker-cred')
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-cred')
         DOCKERHUB_USERNAME    = '19901418'
         IMAGE_NAME            = 'my-jenkins-python-app-ci-cd'
         IMAGE_TAG             = "${env.BUILD_NUMBER}"
