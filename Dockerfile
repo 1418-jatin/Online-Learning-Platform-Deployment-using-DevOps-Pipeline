@@ -6,7 +6,6 @@ WORKDIR /usr/share/nginx/html
 
 # Copy your custom application files (frontend or static site)
 COPY ./index.html .
-COPY ./static ./static
 
 # Optional: replace default nginx config if needed
 # COPY ./nginx.conf /etc/nginx/conf.d/default.conf
