@@ -1,63 +1,48 @@
 pipeline {
-    agent { label 'jenkins-agent' }
+    agent { label 'linux agent' }
 
     environment {
-        // "docker-cred" must be a Jenkins "Username with password" credential
-        // (username = Docker Hub ID, password = Docker Hub password or access token)
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-cred')
-        DOCKERHUB_USERNAME    = '19901418'
-        IMAGE_NAME            = 'my-jenkins-python-app-ci-cd'
-        IMAGE_TAG             = "${env.BUILD_NUMBER}"
-        FULL_IMAGE            = "${DOCKERHUB_USERNAME}/${IMAGE_NAME}"
+        IMAGE_NAME = "19901418/my-jenkins-python-app-ci-cd"
+        IMAGE_TAG  = "latest"
     }
 
     stages {
-
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/1418-jatin/Online-Learning-Platform-Deployment-using-DevOps-Pipeline.git'
+                git url: 'https://github.com/1418-jatin/Online-Learning-Platform-Deployment-using-DevOps-Pipeline.git', branch: 'main'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${FULL_IMAGE}:${IMAGE_TAG} -t ${FULL_IMAGE}:latest ."
-            }
-        }
-
-        stage('Login to Docker Hub') {
-            steps {
-                sh "echo \$DOCKERHUB_CREDENTIALS_PSW | docker login -u \$DOCKERHUB_CREDENTIALS_USR --password-stdin"
+                sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .'
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                sh "docker push ${FULL_IMAGE}:${IMAGE_TAG}"
-                sh "docker push ${FULL_IMAGE}:latest"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-cred',
+                                                 usernameVariable: 'DOCKER_USER',
+                                                 passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                    '''
+                }
             }
         }
 
         stage('Deploy Container') {
             steps {
-                sh """
-                    docker rm -f ${IMAGE_NAME} || true
-                    docker run -d --name ${IMAGE_NAME} -p 8081:80 ${FULL_IMAGE}:latest
-                """
+                sh '''
+                docker rm -f online-learning || true
+                docker run -dit --name online-learning -p 9090:80 ${IMAGE_NAME}:${IMAGE_TAG}
+                '''
             }
         }
     }
 
-    post {
-        always {
-            sh 'docker logout || true'
-        }
-        success {
-            echo "Build ${IMAGE_TAG} pushed to Docker Hub as ${FULL_IMAGE}:${IMAGE_TAG} and deployed on port 8081."
-        }
-        failure {
-            echo 'Pipeline failed — check the stage logs above.'
-        }
+    triggers {
+        githubPush()
     }
 }
