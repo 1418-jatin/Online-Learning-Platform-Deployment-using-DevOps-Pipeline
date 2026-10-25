@@ -1,16 +1,11 @@
-# Use official NGINX base image
-FROM nginx:latest
+FROM python:3.10-slim
 
-# Set working directory inside container
-WORKDIR /usr/share/nginx/html
+RUN apt-get update && apt-get install -y libpq-dev gcc \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy your custom application files (frontend or static site)
-COPY ./index.html .
+WORKDIR /app
+COPY requirement.txt .
+RUN pip install -r requirement.txt
+COPY . .
 
-# Optional: replace default nginx config if needed
-# COPY ./nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port 80
-EXPOSE 80
-
-# NGINX runs automatically as entrypoint
+CMD ["gunicorn", "myapp.wsgi:application", "--bind", "0.0.0.0:8000"]
