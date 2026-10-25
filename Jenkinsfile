@@ -1,21 +1,17 @@
 pipeline {
-    agent { label 'linux agent' }
+    agent any
 
     environment {
-        IMAGE_NAME = "19901418/my-jenkins-python-app-ci-cd"
-        IMAGE_TAG  = "latest"
+        DOCKER_REPO  = "19901418/prt-oct-25th"
+        DOCKER_IMAGE = "${DOCKER_REPO}:${BUILD_NUMBER}"
     }
 
     stages {
-        stage('Checkout Code') {
-            steps {
-                git url: 'https://github.com/1418-jatin/Online-Learning-Platform-Deployment-using-DevOps-Pipeline.git', branch: 'main'
-            }
-        }
+        // Jenkins already checks out the repo (Declarative: Checkout SCM)
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .'
+                sh 'docker build -t ${DOCKER_IMAGE} .'
             }
         }
 
@@ -25,24 +21,22 @@ pipeline {
                                                  usernameVariable: 'DOCKER_USER',
                                                  passwordVariable: 'DOCKER_PASS')]) {
                     sh '''
-                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                        docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push ${DOCKER_IMAGE}
+                        docker tag ${DOCKER_IMAGE} ${DOCKER_REPO}:latest
+                        docker push ${DOCKER_REPO}:latest
                     '''
                 }
             }
         }
-
-        stage('Deploy Container') {
-            steps {
-                sh '''
-                docker rm -f online-learning || true
-                docker run -dit --name online-learning -p 9090:80 ${IMAGE_NAME}:${IMAGE_TAG}
-                '''
-            }
-        }
     }
 
-    triggers {
-        githubPush()
+    post {
+        always {
+            sh '''
+                docker logout || true
+                docker rmi ${DOCKER_IMAGE} ${DOCKER_REPO}:latest || true
+            '''
+        }
     }
 }
