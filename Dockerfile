@@ -1,7 +1,7 @@
 FROM python:3.10-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
-# Install system dependencies for Pillow and psycopg2
+
 RUN apt-get update && apt-get install -y \
     build-essential \
     python3-dev \
