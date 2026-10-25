@@ -9,16 +9,12 @@ pipeline {
 
     stages {
         stage('Checkout SCM') {
-            steps {
-                checkout scm
-            }
+            steps { checkout scm }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh '''
-                docker build -t $IMAGE_NAME:$IMAGE_TAG .
-                '''
+                sh "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
             }
         }
 
@@ -64,8 +60,6 @@ pipeline {
     }
 
     post {
-        always {
-            sh 'docker logout'
-        }
+        always { sh 'docker logout' }
     }
 }
