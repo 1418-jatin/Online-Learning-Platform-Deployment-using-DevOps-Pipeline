@@ -29,10 +29,10 @@ pipeline {
 
         stage('Deploy to Application Servers') {
             steps {
-                sshagent(['ubuntu-cred']) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'ubuntu-cred', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
                     for HOST in 3.142.241.187 3.148.215.92; do
-                        ssh -o StrictHostKeyChecking=no ubuntu@$HOST "
+                        ssh -i $SSH_KEY -o StrictHostKeyChecking=no ubuntu@$HOST "
                             docker pull $IMAGE_NAME:$IMAGE_TAG &&
                             docker stop prt-app || true &&
                             docker rm prt-app || true &&
@@ -46,10 +46,10 @@ pipeline {
 
         stage('Verify Deployment') {
             steps {
-                sshagent(['ec2-ssh-key']) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'ubuntu-cred', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
                     for HOST in 3.142.241.187 3.148.215.92; do
-                        ssh -o StrictHostKeyChecking=no ubuntu@$HOST "
+                        ssh -i $SSH_KEY -o StrictHostKeyChecking=no ubuntu@$HOST "
                             docker ps | grep prt-app
                         "
                     done
