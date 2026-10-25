@@ -1,20 +1,5 @@
 FROM python:3.10-slim
 
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN apt update && apt install -y \
-    build-essential \
-    python3-dev \
-    libjpeg-dev \
-    zlib1g-dev \
-    libfreetype6-dev \
-    liblcms2-dev \
-    libopenjp2-7-dev \
-    libtiff5-dev \
-    libwebp-dev \
-    pkg-config \
-    && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
 
 COPY requirements.txt .
