@@ -29,7 +29,7 @@ pipeline {
 
         stage('Deploy to Application Servers') {
             steps {
-                sshagent(['ec2-ssh-key']) {
+                sshagent(['ubuntu-cred']) {
                     sh '''
                     for HOST in 3.142.241.187 3.148.215.92; do
                         ssh -o StrictHostKeyChecking=no ubuntu@$HOST "
