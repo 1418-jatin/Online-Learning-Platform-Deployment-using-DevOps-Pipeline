@@ -7,4 +7,5 @@ RUN pip install --upgrade pip setuptools wheel && pip install -r requirements.tx
 
 COPY . .
 
-CMD ["gunicorn", "-b", "0.0.0.0:8000", "myproject.wsgi:application"]
+CMD ["gunicorn", "-b", "0.0.0.0:8000", "OnlineLearningPlatform.wsgi:application"]
+
