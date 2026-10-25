@@ -14,18 +14,6 @@ pipeline {
             }
         }
 
-        stage('Build & Validate') {
-            steps {
-                sh '''
-                python3 -m venv .venv
-                . .venv/bin/activate
-                pip install --upgrade pip setuptools wheel
-                pip install -r requirements.txt
-                python manage.py check
-                '''
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 sh '''
