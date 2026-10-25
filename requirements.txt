@@ -2,7 +2,7 @@ Django==4.2.6
 djangorestframework==3.14.0
 gunicorn==21.2.0
 psycopg2-binary==2.9.9
-mysqlclient==2.2.4
+PyMySQL==1.1.0
 requests==2.31.0
 Pillow==10.0.1
 python-decouple==3.8
