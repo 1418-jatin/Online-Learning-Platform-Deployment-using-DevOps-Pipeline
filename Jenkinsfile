@@ -18,10 +18,10 @@ pipeline {
                 sh '''
                     python3 -m venv .venv
                     . .venv/bin/activate
-                    if [ -f requirement.txt ]; then
-                        pip install -r requirement.txt
+                    if [ -f requirements.txt ]; then
+                        pip install -r requirements.txt
                     else
-                        echo "No requirement.txt found, skipping pip install"
+                        echo "No requirements.txt found, skipping pip install"
                     fi
                 '''
             }
